@@ -7,41 +7,15 @@ function ccyFormat(num) {
   return `${num.toFixed(2)}`;
 }
 
-const CartTable = ({productList, cartList, onDecrement, onIncrement, onDelete}) => {
+const CartTable = ({cartList, onDecrement, onIncrement, onDelete}) => {
 
-    const getProduct = (id) => {
-        return productList.find((product) => product.id === id)
-    }
-
-    const getToList = () =>{
-        
-        let list = []
-        
-        if(cartList.length > 0){
-            cartList.map((cart) =>{
-                if(cart.value > 0){
-                    let newList = {
-                        id: cart.id, 
-                        productName: getProduct(cart.id).title,
-                        qty: cart.value,
-                        unit: getProduct(cart.id).price,
-                    }
-                    list.push(newList)
-                }
-                return list;
-            })
-        }
-
-        return list;
-    }
 
     const getSubtotal = () => {
 
         let subtotal = 0;
-        const list = getToList();
 
-        list.map((item) => {
-            let itemSub = item.qty * item.unit
+        cartList.map((item) => {
+            let itemSub = item.value * item.unitPrice
             subtotal += itemSub
         })
 
@@ -50,7 +24,7 @@ const CartTable = ({productList, cartList, onDecrement, onIncrement, onDelete}) 
     }
 
     return (
-        (getToList().length <= 0)?<div style={{ textAlign: "center"}}><h2>No Items in Cart</h2></div>:
+        (cartList.length <= 0)?<div style={{ textAlign: "center"}}><h2>No Items in Cart</h2></div>:
       <><TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="spanning table">
           <TableHead>
@@ -78,17 +52,17 @@ const CartTable = ({productList, cartList, onDecrement, onIncrement, onDelete}) 
             </TableRow>
           </TableHead>
           <TableBody>
-            {getToList().map((row) => (
+            {cartList.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.productName}</TableCell>
-                <TableCell align="right">{row.qty}</TableCell>
-                <TableCell align="right">{`P${row.unit}`}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell align="right">{row.value}</TableCell>
+                <TableCell align="right">{`P${row.unitPrice}`}</TableCell>
                 <TableCell align="right">{`P${ccyFormat(
-                  row.qty * row.unit
+                  row.value * row.unitPrice
                 )}`}</TableCell >
                 <TableCell align='center'>
                   <button
-                    onClick={() => onDecrement(row.id)}
+                    onClick={() => {(row.value === 1)?onDelete(row.id):onDecrement(row.id)}}
                     className="btn btn-secondary"
                     style={{ margin: "2px" }}
                   >
