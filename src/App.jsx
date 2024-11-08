@@ -21,10 +21,6 @@ const App = () => {
     setCartList((prevState) => prevState.filter((cart) => cart.id !== id));
   };
 
-  const getProduct = (id) => {
-    return productList.find((product) => product.id === id);
-  };
-
   const handleIncrement = (id) => {
     const itemIndex = cartList.findIndex((cart) => cart.id === id);
 
@@ -41,9 +37,7 @@ const App = () => {
       const currentList = [...cartList];
       const newCart = {
         id,
-        value: 1,
-        unitPrice: getProduct(id).price,
-        name: getProduct(id).title,
+        value: 1
       };
       currentList.push(newCart);
       setCartList(currentList);
@@ -73,6 +67,7 @@ const App = () => {
 
   const handleDeleteProducts = (id) => {
     setProducts((prevState) => prevState.filter((product) => product.id !== id));
+    setCartList((prevState) => prevState.filter((item) => item.id !== id));
   };
 
   const generateId = () =>{

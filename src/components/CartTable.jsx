@@ -1,31 +1,71 @@
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import React from 'react'
-
+import {
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import React from "react";
 
 function ccyFormat(num) {
   return `${num.toFixed(2)}`;
 }
 
-const CartTable = ({cartList, onDecrement, onIncrement, onDelete}) => {
+const CartTable = ({
+  productList,
+  cartList,
+  onDecrement,
+  onIncrement,
+  onDelete,
+}) => {
+  const getProduct = (id) => {
+    return productList.find((product) => product.id === id);
+  };
 
+  const getToList = () => {
+    let list = [];
 
-    const getSubtotal = () => {
-
-        let subtotal = 0;
-
-        cartList.map((item) => {
-            let itemSub = item.value * item.unitPrice
-            subtotal += itemSub
-        })
-
-        return subtotal;
-
+    if (cartList.length > 0) {
+      cartList.map((cart) => {
+        if (cart.value > 0) {
+          let newList = {
+            id: cart.id,
+            productName: getProduct(cart.id).title,
+            qty: cart.value,
+            unit: getProduct(cart.id).price,
+          };
+          list.push(newList);
+        }
+        return list;
+      });
     }
 
-    return (
-        (cartList.length <= 0)?<div style={{ textAlign: "center"}}><h2>No Items in Cart</h2></div>:
-      <><TableContainer component={Paper}>
+    return list;
+  };
+
+  const getSubtotal = () => {
+    let subtotal = 0;
+    const list = getToList();
+
+    list.map((item) => {
+      let itemSub = item.qty * item.unit;
+      subtotal += itemSub;
+    });
+
+    return subtotal;
+  };
+
+  return getToList().length <= 0 ? (
+    <div style={{ textAlign: "center" }}>
+      <h2>No Items in Cart</h2>
+    </div>
+  ) : (
+    <>
+      <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="spanning table">
           <TableHead>
             <TableRow>
@@ -52,17 +92,19 @@ const CartTable = ({cartList, onDecrement, onIncrement, onDelete}) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {cartList.map((row) => (
+            {getToList().map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell align="right">{row.value}</TableCell>
-                <TableCell align="right">{`P${row.unitPrice}`}</TableCell>
+                <TableCell>{row.productName}</TableCell>
+                <TableCell align="right">{row.qty}</TableCell>
+                <TableCell align="right">{`P${row.unit}`}</TableCell>
                 <TableCell align="right">{`P${ccyFormat(
-                  row.value * row.unitPrice
-                )}`}</TableCell >
-                <TableCell align='center'>
+                  row.qty * row.unit
+                )}`}</TableCell>
+                <TableCell align="center">
                   <button
-                    onClick={() => {(row.value === 1)?onDelete(row.id):onDecrement(row.id)}}
+                    onClick={() => {
+                      row.qty === 1 ? onDelete(row.id) : onDecrement(row.id);
+                    }}
                     className="btn btn-secondary"
                     style={{ margin: "2px" }}
                   >
@@ -76,7 +118,7 @@ const CartTable = ({cartList, onDecrement, onIncrement, onDelete}) => {
                     +
                   </button>
                   <IconButton onClick={() => onDelete(row.id)}>
-                      <DeleteIcon/>
+                    <DeleteIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -91,7 +133,8 @@ const CartTable = ({cartList, onDecrement, onIncrement, onDelete}) => {
           </TableBody>
         </Table>
       </TableContainer>
-      </>);
-}
+    </>
+  );
+};
 
-export default CartTable
+export default CartTable;
